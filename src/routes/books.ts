@@ -11,7 +11,7 @@ import {verifyTokenAndAdmin} from "../middlewares/verifyToken.js";
 // Router
 const router = express.Router();
 
-// HTTP Methods / Verbes
+// HTTP Methods / Verbs
 
 /**
  * @desc Get All Books

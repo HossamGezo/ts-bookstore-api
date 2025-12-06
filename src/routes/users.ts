@@ -19,7 +19,7 @@ const route = express.Router();
  * @desc Update User
  * @route /api/users/:id
  * @method PUT
- * @access private
+ * @access private (user & admin)
  */
 route.put(
   "/:id",
@@ -34,7 +34,7 @@ route.put(
     // Check User
     const user = await User.findById(req.params.id);
     if (!user) {
-      res.status(400).json({message: "User Not Found"});
+      res.status(404).json({message: "User Not Found"});
       return;
     }
     // Hash Password
