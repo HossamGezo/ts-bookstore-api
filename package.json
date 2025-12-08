@@ -5,7 +5,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon dist/index.js"
+    "start": "nodemon dist/index.js",
+    "seed:books": "node --loader ts-node/esm src/seeders/books.seeder.ts -seed",
+    "remove:books": "node --loader ts-node/esm src/seeders/books.seeder.ts -remove"
   },
   "keywords": [],
   "author": "",
