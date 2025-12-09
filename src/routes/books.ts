@@ -17,8 +17,9 @@ import {
 // - - - - - - - - - - Router
 const router = express.Router();
 
-// Book Routers
+// *** /api/books
 router.route("/").get(getAllBooks).post(verifyTokenAndAdmin, createBook);
+// *** /api/books/:id
 router
   .route("/:id")
   .get(getBookById)

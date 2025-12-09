@@ -1,5 +1,5 @@
 // - - - - - - - - - - Import Libraries
-// *** Import Express
+// *** Import Express Types
 import type {Request, Response} from "express";
 // *** Import Express Async Handler
 import asyncHandler from "express-async-handler";
