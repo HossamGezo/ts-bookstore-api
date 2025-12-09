@@ -7,7 +7,7 @@ import {validateAuthor} from "../models/Author.js";
 // Importing express-async-handler
 import asyncHandler from "express-async-handler";
 // Import Middlewares
-import { verifyTokenAndAdmin } from "../middlewares/verifyToken.js";
+import {verifyTokenAndAdmin} from "../middlewares/verifyToken.js";
 
 // Router
 const router = express.Router();
@@ -22,8 +22,12 @@ const router = express.Router();
  */
 router.get(
   "/",
-  asyncHandler(async (_: Request, res: Response) => {
-    const authorsList = await Author.find();
+  asyncHandler(async (req: Request, res: Response) => {
+    const {pageNumber}: any = req.query;
+    const authorsPerPage = 2;
+    const authorsList = await Author.find()
+      .skip((pageNumber - 1) * authorsPerPage)
+      .limit(authorsPerPage);
     // .sort({firstName: -1}) // 👉 Use 1 for ascending order and -1 for descending order.
     // .select("firstName lastName -_id"); // 👉 Write the data you want to display, and to hide the ID, use -_id.
     res.status(200).json(authorsList);
