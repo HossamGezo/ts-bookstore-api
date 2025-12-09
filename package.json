@@ -7,7 +7,9 @@
   "scripts": {
     "start": "nodemon dist/index.js",
     "seed:books": "node --loader ts-node/esm src/seeders/books.seeder.ts -seed",
-    "remove:books": "node --loader ts-node/esm src/seeders/books.seeder.ts -remove"
+    "remove:books": "node --loader ts-node/esm src/seeders/books.seeder.ts -remove",
+    "seed:authors": "node --loader ts-node/esm src/seeders/authors.seeder.ts -seed",
+    "remove:authors": "node --loader ts-node/esm src/seeders/authors.seeder.ts -remove"
   },
   "keywords": [],
   "author": "",
