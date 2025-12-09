@@ -1,19 +1,19 @@
-// Importing Express
+// - - - - - - - - - - Import Libraries
+// *** Import Express
 import express, {type Request, type Response} from "express";
-// Importing Author Model
-import Author from "../models/Author.js";
-// Importing Validation Function
-import {validateAuthor} from "../models/Author.js";
-// Importing express-async-handler
+// *** Import Express Async Handler
 import asyncHandler from "express-async-handler";
-// Import Middlewares
+
+// - - - - - - - - - - Import Local Files
+// *** Import Book Model & Validation Functions
+import Author, {validateAuthor} from "../models/Author.js";
+// *** Import Middlewares
 import {verifyTokenAndAdmin} from "../middlewares/verifyToken.js";
 
-// Router
+// - - - - - - - - - - Router
 const router = express.Router();
 
-// HTTP Methods / Verbs
-
+// - - - - - - - - - - HTTP Methods (Verbs)
 /**
  * @desc Get All Authors
  * @route /api/authors
@@ -23,7 +23,7 @@ const router = express.Router();
 router.get(
   "/",
   asyncHandler(async (req: Request, res: Response) => {
-    const {pageNumber}: any = req.query;
+    const pageNumber = Number(req.query.page) || 1;
     const authorsPerPage = 2;
     const authorsList = await Author.find()
       .skip((pageNumber - 1) * authorsPerPage)
@@ -31,9 +31,9 @@ router.get(
     // .sort({firstName: -1}) // 👉 Use 1 for ascending order and -1 for descending order.
     // .select("firstName lastName -_id"); // 👉 Write the data you want to display, and to hide the ID, use -_id.
     res.status(200).json(authorsList);
+    return;
   })
 );
-
 /**
  * @desc Get Author By Id
  * @route /api/authors/:id
@@ -44,11 +44,15 @@ router.get(
   "/:id",
   asyncHandler(async (req: Request, res: Response) => {
     const author = await Author.findById(req.params.id);
-    if (author) res.status(200).json(author);
-    else res.status(404).json({message: "Author Not Found"});
+    if (author) {
+      res.status(200).json(author);
+      return;
+    } else {
+      res.status(404).json({message: "Author Not Found"});
+      return;
+    }
   })
 );
-
 /**
  * @desc Create A New Author
  * @route /api/authors
@@ -62,7 +66,10 @@ router.post(
     // Validation
     const validate = validateAuthor(req.body);
     // Doesn't Pass Express Validation
-    if (!validate.success) res.status(400).json(validate.error);
+    if (!validate.success) {
+      res.status(400).json(validate.error);
+      return;
+    }
     // Pass Express Validation
     // Create New Author To Save It In Database
     const author = new Author({
@@ -75,9 +82,9 @@ router.post(
     const result = await author.save(); // Promise Expression
     // Response
     res.status(201).json(result);
+    return;
   })
 );
-
 /**
  * @desc Update An Author
  * @route /api/authors/:id
@@ -89,7 +96,10 @@ router.put(
   verifyTokenAndAdmin,
   asyncHandler(async (req: Request, res: Response) => {
     const validate = validateAuthor(req.body);
-    if (!validate.success) res.json(validate.error);
+    if (!validate.success) {
+      res.json(validate.error);
+      return;
+    }
     const author = await Author.findByIdAndUpdate(
       req.params.id,
       {
@@ -99,9 +109,9 @@ router.put(
       {new: true} // 👉 If you want the updated author to appear, you must write { new: true } as the third argument.
     );
     res.status(200).json(author);
+    return;
   })
 );
-
 /**
  * @desc Delete An Author
  * @route /api/author/:id
@@ -116,11 +126,12 @@ router.delete(
     if (author) {
       await Author.findByIdAndDelete(req.params.id); // 👉 Use this command to delete an author.
       res.status(200).json({message: "Author has been deleted"});
+      return;
     } else {
       res.status(404).json({message: "Author Not Found"});
+      return;
     }
   })
 );
 
-// Exporting
 export default router;
