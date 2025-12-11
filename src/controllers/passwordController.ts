@@ -7,6 +7,8 @@ import asyncHandler from "express-async-handler";
 import jwt from "jsonwebtoken";
 // *** Import Bcrypt Js
 import bcrypt from "bcryptjs";
+// *** Import Nodemailer
+import nodemailer from "nodemailer";
 
 // - - - - - - - - - - Import Local Files
 // *** Import User Model
@@ -45,10 +47,32 @@ export const sendForgotPasswordLink = asyncHandler(
       expiresIn: "10m",
     });
     const link = `http://localhost:${process.env.PORT}/password/reset-password/${user.id}/${token}`;
+    // Send Email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.USER_EMAIL,
+        pass: process.env.USER_PASS,
+      },
+    });
+    const mailOptions = {
+      from: process.env.USER_EMAIL,
+      to: user.email,
+      subject: "Reset Password",
+      html: `<div>
+              <h4>Click on the link below to reset your password</h4>
+              <p>${link}</p>
+            </div>`,
+    };
+    transporter.sendMail(mailOptions, (error, success) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Email sent: " + success.response);
+      }
+    });
     // Response
-    res
-      .status(200)
-      .json({message: "Click on the link", resetPasswordLink: link});
+    res.render("link-send");
   }
   // TODO: send email to the user
 );
@@ -71,7 +95,7 @@ export const getRestPasswordView = asyncHandler(
       res.status(403).json({message: "Not Authorized"});
       return;
     }
-    // Reset Password
+    // Verify Token
     const secret = process.env.JWT_SECRET_KEY + user.password;
     try {
       jwt.verify(req.params.token, secret);
