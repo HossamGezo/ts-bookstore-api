@@ -11,8 +11,8 @@ import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
 
 // - - - - - - - - - - Import Local Files
-// *** Import User Model
-import User from "../models/User.js";
+// *** Import User Model & Validation Functions
+import User, {validateChangePassword} from "../models/User.js";
 
 // - - - - - - - - - - HTTP Verbs (methods)
 /**
@@ -67,14 +67,15 @@ export const sendForgotPasswordLink = asyncHandler(
     transporter.sendMail(mailOptions, (error, success) => {
       if (error) {
         console.log(error);
+        res.status(500).json({message: error});
+        return;
       } else {
         console.log("Email sent: " + success.response);
+        res.render("link-send");
+        return;
       }
     });
-    // Response
-    res.render("link-send");
   }
-  // TODO: send email to the user
 );
 /**
  * @desc Get Rest Password View
@@ -115,8 +116,13 @@ export const getRestPasswordView = asyncHandler(
  * @access public
  */
 export const resetPassword = asyncHandler(
-  // TODO: Validation
   async (req: Request, res: Response) => {
+    // *** Validation
+    const validate = validateChangePassword(req.body);
+    if (!validate.success) {
+      res.status(400).json({message: validate.error.message});
+      return;
+    }
     // *** Check User
     const user = await User.findById(req.params.userId);
     if (!user) {
