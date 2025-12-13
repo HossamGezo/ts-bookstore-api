@@ -61,7 +61,14 @@ const registerSchema = z
       .string()
       .trim()
       .regex(/^\S+@\S+\.\S+$/, "Please enter a valid email address"),
-    password: z.string().min(8).trim(),
+    password: z
+      .string()
+      .min(8)
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .regex(/[\W_]/, "Password must contain at least one special character")
+      .trim(),
   })
   .strict();
 type RegisterSchemaProps = z.infer<typeof registerSchema>;
@@ -73,7 +80,14 @@ const loginSchema = z
       .string()
       .trim()
       .regex(/^\S+@\S+\.\S+$/, "Please enter a valid email address"),
-    password: z.string().min(3).max(21).trim(),
+    password: z
+      .string()
+      .min(8)
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .regex(/[\W_]/, "Password must contain at least one special character")
+      .trim(),
   })
   .strict();
 
@@ -88,10 +102,33 @@ const updateSchema = z
       .trim()
       .regex(/^\S+@\S+\.\S+$/, "Please enter a valid email address")
       .optional(),
-    password: z.string().min(8).trim().optional(),
+    password: z
+      .string()
+      .min(8)
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .regex(/[\W_]/, "Password must contain at least one special character")
+      .trim()
+      .optional(),
   })
   .strict();
 type UpdateSchemaProps = z.infer<typeof updateSchema>;
+
+// -------------------- Change Password Schema
+const changePasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8)
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .regex(/[\W_]/, "Password must contain at least one special character")
+      .trim(),
+  })
+  .strict();
+type changePasswordSchemaProps = z.infer<typeof changePasswordSchema>;
 
 // --------------------------------------------------------- Express Validation Functions
 
@@ -110,7 +147,17 @@ const validateUpdateUser = (obj: UpdateSchemaProps) => {
   const parseResult = updateSchema.safeParse(obj);
   return parseResult;
 };
+// -------------------- Validate Change Password
+const validateChangePassword = (obj: changePasswordSchemaProps) => {
+  const parseResult = changePasswordSchema.safeParse(obj);
+  return parseResult;
+};
 
 // --------------------------------------------------------- Export
-export {validateRegisterUser, validateLoginUser, validateUpdateUser};
+export {
+  validateRegisterUser,
+  validateLoginUser,
+  validateUpdateUser,
+  validateChangePassword,
+};
 export default User;
